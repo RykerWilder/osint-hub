@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs the real script (wrappers/ignorant_check.py) against fake modules and a fake httpx, with the asyncio backend.
+HERE=$(cd "$(dirname "$0")" && pwd)
+export PYTHONPATH="$HERE/../fake_pkgs"
+export IGNORANT_BACKEND=asyncio
+exec python3 "$HERE/../../wrappers/ignorant_check.py" "$@"

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Runs Blackbird from its own folder: it reads its data files and writes its results with relative paths.
+#
+# Blackbird does not ship the WhatsMyName site list (data/wmn-data.json): it downloads it during its
+# update check. With --no-update that download is skipped, so on a fresh install Blackbird crashes with
+# "FileNotFoundError: data/wmn-data.json". While the list is missing we therefore drop --no-update and
+# let Blackbird fetch it; from then on --no-update works as intended.
+BLACKBIRD_DIR="${BLACKBIRD_HOME:-/opt/blackbird}"
+BLACKBIRD_PYTHON="${BLACKBIRD_PYTHON:-$BLACKBIRD_DIR/.venv/bin/python}"
+
+cd "$BLACKBIRD_DIR" || exit 127
+mkdir -p data logs results 2>/dev/null
+
+if [ ! -s data/wmn-data.json ]; then
+  echo "[i] Site list not downloaded yet: Blackbird will fetch it now (first run only)."
+  # Rebuild the argument list without --no-update (order and quoting are preserved).
+  for arg in "$@"; do
+    shift
+    [ "$arg" = "--no-update" ] || set -- "$@" "$arg"
+  done
+fi
+
+exec "$BLACKBIRD_PYTHON" blackbird.py "$@"

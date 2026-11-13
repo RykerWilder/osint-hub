@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+import sys
+email = [a for a in sys.argv[1:] if "@" in a][0]
+print("*********************")
+print("   " + email)
+print("*********************")
+sys.stdout.write("  0%|          | 0/120 [00:00<?, ?it/s]\r"); sys.stdout.flush()
+print("[+] twitter.com")
+sys.stdout.write(" 50%|█████     | 60/120 [00:02<00:02, 27.0it/s]\r"); sys.stdout.flush()
+print("[+] github.com")
+print("[x] spotify.com")
+print("[+] Email used, [-] Email not used, [x] Rate limit")
+print("120 websites checked in 4.52 seconds")

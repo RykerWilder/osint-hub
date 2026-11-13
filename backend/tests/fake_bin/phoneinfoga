@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+import sys
+a = sys.argv[1:]
+number = a[a.index("-n") + 1]
+q = number.replace("+", "%2B")
+print(f"Running scan for phone number {number}...")
+print()
+print("Results for local")
+print("Raw local: 3331234567")
+print("Local: 333 123 4567")
+print(f"E164: {number}")
+print("International: 393331234567")
+print("Country: IT")
+print("Results for googlesearch")
+print("Social media:")
+print(f"\tURL: https://www.google.com/search?q=site%3Afacebook.com+intext%3A%22{q}%22")
+print(f"\tURL: https://www.google.com/search?q=site%3Atwitter.com+intext%3A%22{q}%22")
+print("Reputation:")
+print(f"\tURL: https://www.google.com/search?q=site%3Awhocalledme.com+intext%3A%22{q}%22")
+print("Results for ovh")
+print("Found: false")
+print("2 scanner(s) succeeded")

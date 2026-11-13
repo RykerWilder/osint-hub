@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+/*
+  Palette "graphite console": a cool blue-green graphite, a phosphor green used only for what is
+  live or actionable (prompt, Run button, done), amber for work in progress, red for errors,
+  and a pale blue for links. Nothing else is coloured, so colour always means something.
+*/
+/* "static": Tailwind emits every variable, including those only used from JavaScript (status colours). */
+@theme static {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-base: #0c1215;
+  --color-surface: #111a1e;
+  --color-raised: #17242a;
+  --color-term: #090e10;
+  --color-line: #1e2e34;
+  --color-line-strong: #2c434b;
+
+  --color-ink: #d8e6e3;
+  --color-ink-2: #9bb1ad;
+  --color-ink-3: #7b9395;
+
+  --color-signal: #4ee6a1;
+  --color-amber: #f0b648;
+  --color-bad: #ff7a7a;
+  --color-link: #62c7f5;
+
+  --radius-ctl: 3px;
+
+  --animate-pop: pop 0.16s ease-out both;
+  --animate-drawer: drawer 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes drawer {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-base);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  body {
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-signal);
+    color: #04140c;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  input::placeholder { color: var(--color-ink-3); opacity: 0.8; }
+}
+
+@layer components {
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-ctl);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    white-space: nowrap;
+    color: var(--color-ink);
+    background: transparent;
+    transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .btn:hover:not(:disabled) { background: var(--color-raised); border-color: var(--color-ink-3); }
+  .btn:disabled { opacity: 0.45; }
+  .btn-danger { color: var(--color-bad); }
+  .btn-danger:hover:not(:disabled) { border-color: var(--color-bad); background: color-mix(in oklab, var(--color-bad) 10%, transparent); }
+  .btn-primary {
+    background: var(--color-signal);
+    border-color: var(--color-signal);
+    color: #04140c;
+    font-weight: 600;
+  }
+  .btn-primary:hover:not(:disabled) { background: #6cf0b3; border-color: #6cf0b3; }
+
+  /* Main action of the command bar */
+  .btn-run {
+    position: relative;
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    overflow: hidden;
+    padding: 0 1.25rem;
+    border-radius: var(--radius-ctl);
+    background: var(--color-signal);
+    color: #04140c;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.12s;
+  }
+  .btn-run:hover:not(:disabled) { background: #6cf0b3; }
+  .btn-run:disabled { background: var(--color-raised); color: var(--color-ink-3); }
+
+  .link-btn {
+    color: var(--color-ink-2);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line-strong);
+    text-underline-offset: 4px;
+    transition: color 0.12s, text-decoration-color 0.12s;
+  }
+  .link-btn:hover:not(:disabled) { color: var(--color-signal); text-decoration-color: var(--color-signal); }
+
+  /* ---------- Command bar ---------- */
+  /* Chips: data types and tool toggles share the same shape */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-ctl);
+    background: transparent;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--color-ink-2);
+    transition: color 0.12s, background-color 0.12s, border-color 0.12s;
+  }
+  .chip:hover:not(:disabled) { color: var(--color-ink); border-color: var(--color-ink-3); }
+  .chip:disabled { border-style: dashed; opacity: 0.6; }
+  .chip[aria-checked="true"],
+  .chip[aria-expanded="true"] {
+    color: var(--color-ink);
+    background: var(--color-raised);
+    border-color: color-mix(in oklab, var(--color-signal) 55%, var(--color-line-strong));
+  }
+  .chip[role="radio"][aria-checked="true"] svg { color: var(--color-signal); }
+  .chip-box {
+    display: inline-flex;
+    width: 0.9rem;
+    height: 0.9rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-ink-3);
+    border-radius: 2px;
+    color: #04140c;
+  }
+  .chip-box svg { opacity: 0; }
+  .chip[aria-checked="true"] .chip-box { background: var(--color-signal); border-color: var(--color-signal); }
+  .chip[aria-checked="true"] .chip-box svg { opacity: 1; }
+
+  .prompt {
+    display: flex;
+    min-height: 3.25rem;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: stretch;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-ctl);
+    background: var(--color-base);
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .prompt:hover { border-color: var(--color-ink-3); }
+  .prompt:focus-within {
+    border-color: var(--color-signal);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-signal) 16%, transparent);
+  }
+  .cmd-hero .prompt,
+  .cmd-hero .btn-run { min-height: 3.75rem; }
+  .cmd-hero .prompt input[type="text"] { font-size: 1.25rem; }
+  .cmd-docked .prompt,
+  .cmd-docked .btn-run { min-height: 2.875rem; }
+  .prompt-tag:focus-within { outline: 2px solid var(--color-signal); outline-offset: -2px; }
+  .prompt-tag {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.85rem;
+    border-right: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-ctl) 0 0 var(--radius-ctl);
+    background: var(--color-surface);
+    color: var(--color-signal);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .prompt input[type="text"] {
+    min-width: 0;
+    flex: 1 1 auto;
+    background: transparent;
+    padding: 0 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 1.0625rem;
+    caret-color: var(--color-signal);
+    caret-shape: block;
+  }
+  .prompt input[type="text"]:focus { outline: none; }
+
+  /* ---------- Tool navigation (sidebar on desktop, scrolling row on mobile) ---------- */
+  .navitem {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-ctl);
+    font-size: 0.9rem;
+    text-align: left;
+    white-space: nowrap;
+    color: var(--color-ink-2);
+    transition: color 0.12s, background-color 0.12s;
+  }
+  .navitem:hover { color: var(--color-ink); background: color-mix(in oklab, var(--color-raised) 60%, transparent); }
+  .navitem[aria-selected="true"] { color: var(--color-ink); background: var(--color-raised); box-shadow: inset 2px 0 0 var(--color-signal); }
+  .navitem:focus-visible { outline-offset: -2px; }
+  .count {
+    min-width: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: 2px;
+    background: var(--color-raised);
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .navitem[aria-selected="true"] .count { background: color-mix(in oklab, var(--color-signal) 16%, var(--color-base)); color: var(--color-ink); }
+
+  /* ---------- Module progress (one thin segment per module) ---------- */
+  .seg {
+    height: 3px;
+    flex: 1;
+    border-radius: 1px;
+    background: var(--color-line-strong);
+    transition: background-color 0.4s;
+  }
+  .seg[data-status="done"] { background: var(--color-signal); }
+  .seg[data-status="error"] { background: var(--color-bad); }
+  .seg[data-status="timeout"] { background: var(--color-amber); }
+  .seg[data-status="cancelled"] { background: var(--color-ink-3); opacity: 0.5; }
+  .seg[data-status="running"] {
+    background-color: color-mix(in oklab, var(--color-amber) 55%, var(--color-line-strong));
+    background-image: linear-gradient(90deg, transparent 0%, var(--color-amber) 50%, transparent 100%);
+    background-size: 45% 100%;
+    background-repeat: no-repeat;
+    animation: bar-shimmer 1.2s linear infinite;
+  }
+
+  /* Result that just arrived: green mark on the edge that fades out */
+  .fresh-row { position: relative; animation: fresh-bg 2.4s ease-out both; }
+  .fresh-row::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 2px;
+    bottom: 2px;
+    width: 2px;
+    background: var(--color-signal);
+    animation: fresh-bar 2.4s ease-out both;
+  }
+
+  /* ---------- Terminal ---------- */
+  .term {
+    background: var(--color-term);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-ctl);
+  }
+  .caret::after {
+    content: "";
+    display: inline-block;
+    width: 0.55em;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--color-signal);
+    animation: caret-blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes bar-shimmer {
+  from { background-position: -60% 0; }
+  to { background-position: 160% 0; }
+}
+@keyframes fresh-bg {
+  0% { background-color: color-mix(in oklab, var(--color-signal) 15%, transparent); }
+  100% { background-color: transparent; }
+}
+@keyframes fresh-bar {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

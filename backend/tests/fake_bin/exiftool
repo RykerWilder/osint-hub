@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+import json, os, sys, time
+path = sys.argv[-1]
+if path.endswith(".bad"):
+    print(json.dumps([{"SourceFile": path, "ExifTool:Error": "Unknown file type"}]))
+    sys.exit(1)
+tags = {
+    "SourceFile": path,
+    "ExifTool:ExifToolVersion": 13.25,
+    "System:FileName": "upload.jpg",
+    "System:Directory": "/tmp/x",
+    "System:FileSize": "2.1 MB",
+    "System:FileModifyDate": time.strftime("%Y:%m:%d %H:%M:%S", time.gmtime(os.path.getmtime(path))),
+    "System:FileAccessDate": "2026:11:12 10:00:00+00:00",
+    "File:FileType": "JPEG",
+    "File:MIMEType": "image/jpeg",
+    "IFD0:Make": "Apple",
+    "IFD0:Model": "iPhone 13",
+    "IFD0:Software": "16.4",
+    "ExifIFD:DateTimeOriginal": "2023:04:01 10:20:30",
+    "ExifIFD:LensModel": "iPhone 13 back dual wide camera 5.1mm f/1.6",
+    "ExifIFD:BodySerialNumber": "F2LXXXX",
+    "GPS:GPSLatitudeRef": "North",
+    "GPS:GPSAltitude": "21.3 m Above Sea Level",
+    "XMP-dc:Subject": ["roma", "viaggio"],
+    "IFD1:ThumbnailImage": "(Binary data 4381 bytes, use -b option to extract)",
+    "Composite:GPSLatitude": "+41.890251",
+    "Composite:GPSLongitude": "+12.492373",
+    "Composite:GPSPosition": "+41.890251, +12.492373",
+    "Composite:ImageSize": "4032x3024",
+}
+sys.stderr.write("Warning: [minor] fake warning\n")
+print(json.dumps([tags]))

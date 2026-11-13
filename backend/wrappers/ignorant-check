@@ -1,0 +1,3 @@
+#!/bin/sh
+# Runs ignorant_check.py with Ignorant's own Python environment.
+exec /opt/venvs/ignorant/bin/python /opt/wrappers/ignorant_check.py "$@"

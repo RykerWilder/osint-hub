@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import sys
+a = sys.argv[1:]
+kind = "email" if "--email" in a else "username"
+target = a[a.index("--" + kind) + 1]
+if target == "boom":
+    print("Traceback (fake): boom")
+    sys.exit(2)
+if target == "slow":
+    print("[+] [GitHub] https://github.com/slow", flush=True)
+    import time
+    time.sleep(60)
+print("Blackbird (fake) - visit https://github.com/p1ngul1n0/blackbird for updates")
+print(f"[+] [GitHub] https://github.com/{target}")
+print(f"[-] [Twitter] https://twitter.com/{target} not found")
+print("[!] [Facebook] error: timeout https://facebook.com/x")
+print(f"[+] [Reddit] https://www.reddit.com/user/{target}")
+print(f"✔️ [Keybase] https://keybase.io/{target}")
+print(f"[+] [GitHub] https://github.com/{target}")
+print("Search completed")

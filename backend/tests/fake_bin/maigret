@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+import sys
+user = sys.argv[1]
+print("[-] Starting a search on top 500 sites from the Maigret database...")
+print(f"[*] Checking username {user} on:")
+sys.stdout.write("Searching |████      | 40%\r"); sys.stdout.flush()
+print(f"[+] GitHub: https://github.com/{user}")
+print("├─uid: 31013580")
+print("├─fullname: Mario Rossi")
+print("└─image: https://avatars.example/x.png")
+print(f"[+] Reddit: https://www.reddit.com/user/{user}")
+print("[*] Search completed")
